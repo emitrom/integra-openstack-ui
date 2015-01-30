@@ -3,7 +3,9 @@
 1) Add file horizon/openstack_dashboard/enabled/_50_integra.py
 
 DASHBOARD = 'integra'
+
 DISABLED = False
+
 ADD_INSTALLED_APPS = [
     'openstack_dashboard.dashboards.integra',
 ]
