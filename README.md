@@ -1,6 +1,6 @@
-# integra-openstack-ui
+# integra-openstack-ui installation steps
 
-1) Add file horizon/openstack_dashboard_enabled/_50_integra.py
+1) Add file horizon/openstack_dashboard/enabled/_50_integra.py
 
 ### The name of the dashboard to be added to HORIZON['dashboards']. Required.
 DASHBOARD = 'integra'
@@ -13,7 +13,9 @@ ADD_INSTALLED_APPS = [
     'openstack_dashboard.dashboards.integra',
 ]
 
-2) from horizon directiony run
+2) git clone this repo to horizon/openstack_dashboard/dashboards/integra
+
+3) from horizon directiony run
 ./run_tests.sh --runserver 0.0.0.0:8877
 
-3) connect to openstack http://<your ip>:8877
+4) connect to openstack http://<your ip>:8877
