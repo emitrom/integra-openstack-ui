@@ -15,4 +15,4 @@ ADD_INSTALLED_APPS = [
 3) from horizon directiony run
 ./run_tests.sh --runserver 0.0.0.0:8877
 
-4) connect to openstack http://<your ip>:8877
+4) connect to openstack http://yourIP:8877
