@@ -3,7 +3,7 @@ from horizon import tabs
 
 import json
 from openstack_dashboard.dashboards.integra.add_provider import tables
-from openstack_dashboard.dashboards.integra.add_provider.tables import InstancesTable
+from openstack_dashboard.dashboards.integra.list_providers.tables import InstancesTable
 
 class Provider:
     """

@@ -6,4 +6,5 @@ CREATE_URL = r'^create'
 
 urlpatterns = patterns('openstack_dashboard.dashboards.integra.add_provider.views',
     url(INDEX_URL, views.PostIndexView.as_view(), name='index'),
+    url(CREATE_URL, views.PostCreateView.as_view(), name='create'),
 )

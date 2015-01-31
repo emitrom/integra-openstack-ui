@@ -1,17 +1,13 @@
 {% extends 'integra/base.html' %}
 {% load i18n %}
-{% block title %}{% trans "Schedule List" %}{% endblock %}
+{% block title %}{% trans "Posts" %}{% endblock %}
 
 {% block page_header %}
-   {% include "horizon/common/_page_header.html" with title=_("Schedule List") %}
+  {% include "horizon/common/_page_header.html" with title=_("Posts") %}
 {% endblock page_header %}
 
-{% block integra_main %}
-<div class="row">
-   <div class="col-sm-12">
-   {{ table.render }}
-   </div>
-</div>
+{% block main %}
+  {{ table.render }}
 {% endblock %}
 
 

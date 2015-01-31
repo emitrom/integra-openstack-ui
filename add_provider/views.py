@@ -1,27 +1,26 @@
-from horizon import tabs
+import traceback
 
-import json
-from openstack_dashboard.dashboards.integra.add_provider import tables
-from openstack_dashboard.dashboards.integra.add_provider.tables import InstancesTable
+from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
+from django.shortcuts import render
 
-class Provider:
-    """
-    Provider data
-    """
+from horizon import exceptions, tables, workflows, forms, tabs
 
-    def __init__(self, id, name, description):
-        self.id = id
-        self.name = name
-        self.description = description
+from openstack_dashboard.dashboards.integra.add_provider.tables import PostsTable
+from openstack_dashboard.dashboards.integra.add_provider.post.post import Post
+from openstack_dashboard.dashboards.integra.add_provider import utils
+from openstack_dashboard.dashboards.integra.add_provider.workflows.create_post import CreatePost
 
-class PostIndexView(tables.tables.DataTableView):
-    table_class = InstancesTable
+class PostIndexView(tables.DataTableView):
+    table_class = PostsTable
     template_name = 'integra/add_provider/index.html'
 
     def get_data(self):
-        strobj = '[{"id": 1, "name": "plugin", "description": "A plugin provider"}, {"id": 2, "name": "aws", "description": "A amazon web services provider"}]'
-        instances = json.loads(strobj)
-        ret = []
-        for inst in instances:
-            ret.append(Provider(inst['id'], inst['name'], inst['description']))
-        return ret
+        return utils.get_posts(self)
+
+class PostCreateView(workflows.WorkflowView):
+    workflow_class = CreatePost
+
+    def get_initial(self):
+        initial = super(PostCreateView, self).get_initial()
+        return initial
