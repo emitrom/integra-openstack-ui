@@ -1,12 +1,17 @@
-{% extends 'base.html' %}
+{% extends 'integra/base.html' %}
 {% load i18n %}
-{% block title %}{% trans "Add_Provider" %}{% endblock %}
+{% block title %}{% trans "Schedule List" %}{% endblock %}
 
 {% block page_header %}
-  {% include "horizon/common/_page_header.html" with title=_("Add_Provider") %}
+   {% include "horizon/common/_page_header.html" with title=_("Schedule List") %}
 {% endblock page_header %}
 
-{% block main %}
+{% block integra_main %}
+<div class="row">
+   <div class="col-sm-12">
+   {{ table.render }}
+   </div>
+</div>
 {% endblock %}
 
 

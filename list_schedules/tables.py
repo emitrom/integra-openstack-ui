@@ -8,7 +8,6 @@ class InstancesTable(tables.DataTable):
     status = tables.Column("status", verbose_name=_("Status"))
     zone = tables.Column('availability_zone',
                           verbose_name=_("Availability Zone"))
-    image_name = tables.Column('image_name', verbose_name=_("Image Name"))
 
     class Meta:
         name = "instances"

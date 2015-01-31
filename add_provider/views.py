@@ -1,10 +1,27 @@
-from horizon import views
+from horizon import tabs
 
+import json
+from openstack_dashboard.dashboards.integra.add_provider import tables
+from openstack_dashboard.dashboards.integra.add_provider.tables import InstancesTable
 
-class IndexView(views.APIView):
-    # A very simple class-based view...
+class Provider:
+    """
+    Provider data
+    """
+
+    def __init__(self, id, name, description):
+        self.id = id
+        self.name = name
+        self.description = description
+
+class PostIndexView(tables.tables.DataTableView):
+    table_class = InstancesTable
     template_name = 'integra/add_provider/index.html'
 
-    def get_data(self, request, context, *args, **kwargs):
-        # Add data to the context here...
-        return context
+    def get_data(self):
+        strobj = '[{"id": 1, "name": "plugin", "description": "A plugin provider"}, {"id": 2, "name": "aws", "description": "A amazon web services provider"}]'
+        instances = json.loads(strobj)
+        ret = []
+        for inst in instances:
+            ret.append(Provider(inst['id'], inst['name'], inst['description']))
+        return ret

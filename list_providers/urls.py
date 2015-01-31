@@ -1,11 +1,9 @@
-from django.conf.urls import patterns
-from django.conf.urls import url
-
+from django.conf.urls import patterns, url
 from openstack_dashboard.dashboards.integra.list_providers import views
 
+INDEX_URL = r'^$'
+CREATE_URL = r'^create'
 
-urlpatterns = patterns('',
-    url(r'^$', views.IndexView.as_view(), name='index'),
-    url(r'^\?tab=mypanel_tabs_tab$',
-        views.IndexView.as_view(), name='mypanel_tabs'),
+urlpatterns = patterns('openstack_dashboard.dashboards.integra.add_provider.views',
+    url(INDEX_URL, views.ProvidersView.as_view(), name='index'),
 )
