@@ -6,7 +6,7 @@ import horizon
 class Providers(horizon.PanelGroup):
     slug = "providers"
     name = _("Providers")
-    panels = ('list_providers', 'add_provider', 'remove_provider')
+    panels = ('list_providers', 'add_provider', 'remove_provider', 'wp')
 
 class Workflows(horizon.PanelGroup):
     slug = "workflows"

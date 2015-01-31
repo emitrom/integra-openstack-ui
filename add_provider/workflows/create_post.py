@@ -55,8 +55,8 @@ class CreatePost(workflows.Workflow):
     finalize_button_name = _("Create")
     success_message = _('Created Post named "%s".')
     failure_message = _('Unable to create post named "%s".')
-    success_url = "horizon:project:wp:index"
-    failure_url = "horizon:project:wp:index"
+    success_url = "horizon:integra:add_provider:index"
+    failure_url = "horizon:integra:add_provider:index"
     default_steps = (SetPostDetails,)
 
     def format_status_message(self, message):

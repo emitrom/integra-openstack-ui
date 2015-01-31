@@ -12,15 +12,8 @@ from openstack_dashboard.dashboards.integra.add_provider import utils
 class CreatePost(tables.LinkAction):
     name = "create"
     verbose_name = _("Create Post")
-    url = "horizon:project:integra:create"
+    url = "horizon:integra:add_provider:create"
     classes = ("btn-launch", "ajax-modal")
-
-class EditPost(tables.LinkAction):
-    name = "update"
-    verbose_name = _("Edit Post")
-    url = "horizon:project:integra:update"
-    classes = ("ajax-modal",)
-    icon = "pencil"
 
 class DeletePost(tables.DeleteAction):
     data_type_singular = _("Post")
@@ -80,5 +73,4 @@ class PostsTable(tables.DataTable):
         row_class = UpdateRow
         table_actions = (CreatePost,
                          PostFilterAction)
-        row_actions = (DeletePost,
-                       EditPost)
+        row_actions = (DeletePost,)
