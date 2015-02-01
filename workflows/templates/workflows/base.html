@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block css %}
+  {% include "_stylesheets.html" %}
+
+  {% load compress %}
+  {% compress css %}
+  <link href='{{ STATIC_URL }}integra/workflows/scss/workflows.scss' type='text/scss' media='screen' rel='stylesheet' />
+  {% endcompress %}
+{% endblock %}
+
+{% block js %}
+    {% include "integra/_scripts.html" %}
+{% endblock %}
