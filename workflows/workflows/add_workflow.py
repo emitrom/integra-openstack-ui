@@ -1,11 +1,6 @@
 import traceback
 
 from horizon import workflows, forms, exceptions
-from horizon.utils import validators
-
-from django.core.validators import MinValueValidator
-from django.core.exceptions import ValidationError  # noqa
-from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from openstack_dashboard.dashboards.integra.workflows import utils
@@ -13,17 +8,17 @@ from openstack_dashboard.dashboards.integra.workflows import utils
 
 class SetPostDetailsAction(workflows.Action):
 
-    post_title = forms.CharField(
-        label=_("Post Title"),
+    name = forms.CharField(
+        label=_("Name"),
         required=True,
         max_length=80,
-        help_text=_("Enter a title name for your post."))
+        help_text=_("Name"))
 
-    post_content = forms.CharField(
-        label=_("Content"),
+    description = forms.CharField(
+        label=_("Description"),
         required=True,
-        help_text=_("Enter content for your post."),
-        widget = forms.Textarea)
+        max_length=120,
+        help_text=_("Description"))
 
     class Meta:
         name = _("Details")
@@ -36,12 +31,12 @@ class SetPostDetailsAction(workflows.Action):
 
 class SetPostDetails(workflows.Step):
     action_class = SetPostDetailsAction
-    contributes = ("post_title", "post_content")
+    contributes = ("name", "description")
 
     def contribute(self, data, context):
         if data:
-            context['post_title'] = data.get("post_title", "")
-            context['post_content'] = data.get("post_content", "")
+            context['name'] = data.get("name", "")
+            context['description'] = data.get("description", "")
         return context
 
 
@@ -49,18 +44,18 @@ class SetPostDetails(workflows.Step):
 # Create the post
 # =====
 
-class CreatePost(workflows.Workflow):
-    slug = "create_post"
-    name = _("Create Post")
-    finalize_button_name = _("Create")
-    success_message = _('Created Post named "%s".')
-    failure_message = _('Unable to create post named "%s".')
+class AddWorkflow(workflows.Workflow):
+    slug = "add"
+    name = _("Add")
+    finalize_button_name = _("Add")
+    success_message = _('Added workflow "%s".')
+    failure_message = _('Unable to add provider "%s".')
     success_url = "horizon:integra:workflows:index"
     failure_url = "horizon:integra:workflows:index"
     default_steps = (SetPostDetails,)
 
     def format_status_message(self, message):
-         return message % self.context.get('post_title', 'unknown post')
+         return message % self.context.get('name', 'unknown workflow')
 
     def handle(self, request, context):
         try:
@@ -69,9 +64,9 @@ class CreatePost(workflows.Workflow):
                 print("-----------------")
             print("===================")
 
-            utils.create_post(self, request, context)
+            utils.addWorkflow(self, request, context)
             return True
         except Exception:
             print traceback.format_exc()
-            exceptions.handle(request, _("Unable to setup post create."))
+            exceptions.handle(request, _("Unable to add workflow"))
             return False

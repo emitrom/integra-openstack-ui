@@ -1,81 +1,70 @@
 import traceback
-import xmlrpclib
-import time
-from time import mktime
-from datetime import datetime
+from requests.auth import HTTPBasicAuth
 
-from django.template.defaultfilters import register # noqa
-from django.utils.datastructures import SortedDict
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
+import requests
 
 from horizon import exceptions
 
-from openstack_dashboard.dashboards.integra.workflows.post.post import Post
 
+requests.packages.urllib3.disable_warnings()
 
-WORDPRESS_IP = "15.126.226.211"
-WORDPRESS_URL = "http://%s/" % WORDPRESS_IP
-WORDPRESS_XMLRPC_URL = "http://%s/xmlrpc.php" % WORDPRESS_IP
-WORDPRESS_USERNAME = "demo"
-WORDPRESS_PASSWORD = "stack"
+integra_url = "https://localhost:8443/rest"
+json_headers = {'Accept': 'application/json'}
 
-def get_posts(self):
+class Workflow:
+    """
+    Workflow data
+    """
+
+    def __init__(self, id, name, description):
+        self.id = id
+        self.name = name
+        self.description = description
+
+def getWorkflows(self):
     try:
-        server = xmlrpclib.ServerProxy(WORDPRESS_XMLRPC_URL)
-        posts = server.wp.getPosts(0,WORDPRESS_USERNAME,WORDPRESS_PASSWORD)
 
-        for post in posts:
-            post['id'] = post['post_id']
+        r = requests.get(integra_url + "/workflows", verify=False, auth=HTTPBasicAuth('admin', 'integra'), headers=json_headers)
 
-        return [Post(**p) for p in posts]
+        workflows = []
+        for workflow in r.json()['workflows']:
+            workflows.append(Workflow(workflow[u'id'], workflow[u'name'], workflow[u'description']))
+
+        return workflows
 
     except:
         exceptions.handle(self.request,
                           _('Unable to retrieve list of posts.'))
         return []
 
-
-def create_post(self, request, context):
+# request - horizon environment settings
+# context - user inputs from form
+def addWorkflow(self, request, context):
     try:
 
-        title = context.get('post_title')
-        content = context.get('post_content')
-        status = 'publish'
+        name = context.get('name')
+        description = context.get('description')
 
-        server = xmlrpclib.ServerProxy(WORDPRESS_XMLRPC_URL)
-
-        data = {'post_title': title, 'post_content': content, 'post_status': status}
-        post_id = server.wp.newPost(0, WORDPRESS_USERNAME, WORDPRESS_PASSWORD, data)
-        return post_id
+        payload = {'name': name, 'description': description}
+        requests.post(integra_url + "/workflows", json=payload, verify=False, auth=HTTPBasicAuth('admin', 'integra'), headers=json_headers)
 
     except:
-        print "Exception inside utils.create_post"
+        print "Exception inside utils.addWorkflow"
         print traceback.format_exc()
         exceptions.handle(self.request,
-                          _('Unable to create new post.'))
+                          _('Unable to add workflow'))
         return []
 
-
-def delete_post(self, post_id):
+# id is required for table
+def deleteWorkflow(self, workflowId):
     try:
-        server = xmlrpclib.ServerProxy(WORDPRESS_XMLRPC_URL)
-        return server.wp.deletePost(0, WORDPRESS_USERNAME, WORDPRESS_PASSWORD, post_id)
+
+        requests.delete(integra_url + "/workflows/" + workflowId, verify=False, auth=HTTPBasicAuth('admin', 'integra'), headers=json_headers)
+
     except:
-        print "Exception inside utils.delete_post"
+        print "Exception inside utils.deleteWorkflow"
         print traceback.format_exc()
         exceptions.handle(self.request,
-                          _('Unable to delete post.'))
+                          _('Unable to delete workflow'))
         return False
-
-
-@register.filter
-def parse_time(xmlrpcdt, default=None):
-    try:
-        struct = time.strptime(str(xmlrpcdt), "%Y%m%dT%H:%M:%S")
-        dt = datetime.fromtimestamp(mktime(struct))
-        return dt.strftime("%B %d, %Y at %H:%M")
-    except Exception:
-        print "Exception inside utils.parse_time"
-        print traceback.format_exc()
-        return default or ''

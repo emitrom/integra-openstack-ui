@@ -1,28 +1,24 @@
-from django import template
-from django.template.defaultfilters import filesizeformat, time
-from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 
-from horizon import tables  #, workflows, forms
+from horizon import tables
 
 from openstack_dashboard.dashboards.integra.workflows import utils
 
 
-class CreatePost(tables.LinkAction):
-    name = "create"
-    verbose_name = _("Create Post")
+class AddTableData(tables.LinkAction):
+    name = "add"
+    verbose_name = _("Add Workflow")
     url = "horizon:integra:workflows:create"
     classes = ("btn-launch", "ajax-modal")
 
-class DeletePost(tables.DeleteAction):
-    data_type_singular = _("Post")
-    data_type_plural = _("Posts")
+class DeleteTableData(tables.DeleteAction):
+    data_type_singular = _("Workflow")
+    data_type_plural = _("Workflow")
 
     def delete(self, request, obj_id):
-        utils.delete_post(self, obj_id)
+        utils.deleteWorkflow(self, obj_id)
 
-class PostFilterAction(tables.FilterAction):
+class FilterAction(tables.FilterAction):
     def filter(self, table, posts, filter_string):
         """Naive case-insensitive search."""
         filterString = filter_string.lower()
@@ -35,42 +31,18 @@ class UpdateRow(tables.Row):
     def get_data(self, request, post_id):
         pass
 
-class PostsTable(tables.DataTable):
+class WorkflowTable(tables.DataTable):
 
-    STATUS_CHOICES=(
-        ('draft', True),
-        ('pending', True),
-        ('private', True),
-        ('publish', True),
-    )
+    name = tables.Column("name",
+                          verbose_name=_("Name"))
 
-    STATUS_DISPLAY_CHOICES=(
-        ('Draft', _('Draft')),
-        ('Pending', _('Pending')),
-        ('Private', _('Private')),
-        ('Publish', _('Publish')),
-    )
-
-    title = tables.Column("post_title",
-                          verbose_name=_("Post Title"))
-
-    date = tables.Column("post_date",
-                           verbose_name=_("Date"),
-                           filters=(utils.parse_time,),
-                           attrs={'data-type': 'datetime'}
-                           )
-
-    status = tables.Column("post_status",
-                          verbose_name=_("Status"),
-                          status=True,
-                          status_choices=STATUS_CHOICES,
-                          display_choices=STATUS_DISPLAY_CHOICES)
+    description = tables.Column("description",
+                          verbose_name=_("Description"))
 
     class Meta:
         name = "integra"
-        verbose_name = _("Posts BLA")
-        status_columns = ["status"]
+        verbose_name = _("Workflows")
         row_class = UpdateRow
-        table_actions = (CreatePost,
-                         PostFilterAction)
-        row_actions = (DeletePost,)
+        table_actions = (AddTableData,
+                         FilterAction)
+        row_actions = (DeleteTableData,)
