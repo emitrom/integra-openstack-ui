@@ -1,73 +1,62 @@
 import traceback
-import xmlrpclib
 import time
-import json
 from time import mktime
 from datetime import datetime
+from requests.auth import HTTPBasicAuth
 
-from django.template.defaultfilters import register # noqa
-from django.utils.datastructures import SortedDict
+from django.template.defaultfilters import register
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
+import requests, json
 
 from horizon import exceptions
 
-from openstack_dashboard.dashboards.integra.providers.post.post import Post
 
+requests.packages.urllib3.disable_warnings()
 
-WORDPRESS_IP = "15.126.226.211"
-WORDPRESS_URL = "http://%s/" % WORDPRESS_IP
-WORDPRESS_XMLRPC_URL = "http://%s/xmlrpc.php" % WORDPRESS_IP
-WORDPRESS_USERNAME = "demo"
-WORDPRESS_PASSWORD = "stack"
+integra_url = "https://localhost:8443/rest"
+json_headers = {'Accept': 'application/json'}
 
-class Post:
+class Provider:
     """
     Provider data
     """
 
-    def __init__(self, id, post_title, post_date, post_status):
+    def __init__(self, id, name, description):
         self.id = id
-        self.post_title = post_title
-        self.post_date = post_date
-        self.post_status = post_status
+        self.name = name
+        self.description = description
 
 def get_posts(self):
     try:
-        #server = xmlrpclib.ServerProxy(WORDPRESS_XMLRPC_URL)
-        #posts = server.wp.getPosts(0,WORDPRESS_USERNAME,WORDPRESS_PASSWORD)
+        r = requests.get(integra_url + "/providers", verify=False, auth=HTTPBasicAuth('admin', 'integra'), headers=json_headers)
 
-        strobj = '[{"id": 1, "post_title": "bla 1", "post_date": 232938293829, "post_status": "published"}]'
-        instances = json.loads(strobj)
-        ret = []
+        providers = []
+        for provider in r.json()['providers']:
+            print(provider)
+            print(provider[u'id'])
+            providers.append(Provider(provider[u'id'], provider[u'name'], provider[u'description']))
 
-        for inst in instances:
-            ret.append(Post(inst['id'], inst['post_title'], inst['post_date'], inst['post_status']))
-        return ret
-
-        #for post in posts:
-        #    post['id'] = post['post_id']
-
-        #return [Post(**p) for p in posts]
+        return providers
 
     except:
         exceptions.handle(self.request,
                           _('Unable to retrieve list of posts.'))
         return []
 
-
+# request - horizon environment settings
+# context - user inputs from form
 def create_post(self, request, context):
     try:
 
-        title = context.get('post_title')
-        content = context.get('post_content')
-        status = 'publish'
+        name = context.get('post_name')
+        description = context.get('post_description')
+        hostname = context.get('post_hostname')
+        port = context.get('post_port')
+        timeout = context.get('post_timeout')
+        secured = context.get('post_secured')
 
-        server = xmlrpclib.ServerProxy(WORDPRESS_XMLRPC_URL)
-
-        data = {'post_title': title, 'post_content': content, 'post_status': status}
-        post_id = server.wp.newPost(0, WORDPRESS_USERNAME, WORDPRESS_PASSWORD, data)
-        return post_id
+        payload = {'name': name, 'description': description, 'hostname': hostname, 'port': port, 'timeout': timeout, 'secured': secured}
+        requests.post(integra_url + "/providers", json=payload, verify=False, auth=HTTPBasicAuth('admin', 'integra'), headers=json_headers)
 
     except:
         print "Exception inside utils.create_post"
@@ -76,11 +65,12 @@ def create_post(self, request, context):
                           _('Unable to create new post.'))
         return []
 
-
+# id is required for table
 def delete_post(self, post_id):
     try:
-        server = xmlrpclib.ServerProxy(WORDPRESS_XMLRPC_URL)
-        return server.wp.deletePost(0, WORDPRESS_USERNAME, WORDPRESS_PASSWORD, post_id)
+
+        requests.delete(integra_url + "/providers/" + post_id, verify=False, auth=HTTPBasicAuth('admin', 'integra'), headers=json_headers)
+
     except:
         print "Exception inside utils.delete_post"
         print traceback.format_exc()

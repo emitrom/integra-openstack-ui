@@ -13,17 +13,42 @@ from openstack_dashboard.dashboards.integra.providers import utils
 
 class SetPostDetailsAction(workflows.Action):
 
-    post_title = forms.CharField(
-        label=_("Post Title"),
+    post_name = forms.CharField(
+        label=_("Name"),
         required=True,
         max_length=80,
-        help_text=_("Enter a title name for your post."))
+        help_text=_("Name"))
 
-    post_content = forms.CharField(
-        label=_("Content"),
+    post_description = forms.CharField(
+        label=_("Description"),
         required=True,
-        help_text=_("Enter content for your post."),
-        widget = forms.Textarea)
+        max_length=120,
+        help_text=_("Description"))
+
+    post_hostname = forms.CharField(
+        label=_("Hostname"),
+        required=True,
+        max_length=120,
+        help_text=_("Hostname"))
+
+    post_port = forms.IntegerField(
+        label=_("Port"),
+        required=True,
+        min_value=1,
+        max_value=65535,
+        help_text=_("Port"))
+
+    post_timeout = forms.IntegerField(
+        label=_("Timeout"),
+        required=True,
+        min_value=1,
+        max_value=100000,
+        help_text=_("Timeout"))
+
+    post_secured = forms.BooleanField(
+        label=_("Secured"),
+        required=False,
+        help_text=_("Secured"))
 
     class Meta:
         name = _("Details")
@@ -36,12 +61,16 @@ class SetPostDetailsAction(workflows.Action):
 
 class SetPostDetails(workflows.Step):
     action_class = SetPostDetailsAction
-    contributes = ("post_title", "post_content")
+    contributes = ("post_name", "post_description", "post_hostname", "post_port", "post_timeout", "post_secured")
 
     def contribute(self, data, context):
         if data:
-            context['post_title'] = data.get("post_title", "")
-            context['post_content'] = data.get("post_content", "")
+            context['post_name'] = data.get("post_name", "")
+            context['post_description'] = data.get("post_description", "")
+            context['post_hostname'] = data.get("post_hostname", "")
+            context['post_port'] = data.get("post_port", "")
+            context['post_timeout'] = data.get("post_timeout", "")
+            context['post_secured'] = data.get("post_secured", "")
         return context
 
 
@@ -50,17 +79,17 @@ class SetPostDetails(workflows.Step):
 # =====
 
 class CreatePost(workflows.Workflow):
-    slug = "create_post"
-    name = _("Create Post")
-    finalize_button_name = _("Create")
-    success_message = _('Created Post named "%s".')
-    failure_message = _('Unable to create post named "%s".')
+    slug = "add"
+    name = _("Add")
+    finalize_button_name = _("Add")
+    success_message = _('Added provider "%s".')
+    failure_message = _('Unable to add provider "%s".')
     success_url = "horizon:integra:providers:index"
     failure_url = "horizon:integra:providers:index"
     default_steps = (SetPostDetails,)
 
     def format_status_message(self, message):
-         return message % self.context.get('post_title', 'unknown post')
+         return message % self.context.get('post_name', 'unknown post')
 
     def handle(self, request, context):
         try:

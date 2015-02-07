@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, url
-from openstack_dashboard.dashboards.integra.add_provider import views
+from openstack_dashboard.dashboards.integra.schedules import views
 
 INDEX_URL = r'^$'
 CREATE_URL = r'^create'
