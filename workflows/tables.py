@@ -4,7 +4,6 @@ from horizon import tables
 
 from openstack_dashboard.dashboards.integra.workflows import utils
 
-
 class AddTableData(tables.LinkAction):
     name = "add"
     verbose_name = _("Add Workflow")
@@ -17,6 +16,12 @@ class DeleteTableData(tables.DeleteAction):
 
     def delete(self, request, obj_id):
         utils.deleteWorkflow(self, obj_id)
+
+class ExecuteWorkflowAction(tables.LinkAction):
+    name = "execute"
+    verbose_name = _("Execute Workflow")
+    url = "horizon:integra:workflows:execute"
+    classes = ("btn-launch", "ajax-modal")
 
 class FilterAction(tables.FilterAction):
     def filter(self, table, posts, filter_string):
@@ -47,5 +52,5 @@ class WorkflowTable(tables.DataTable):
         verbose_name = _("Workflows")
         row_class = UpdateRow
         table_actions = (AddTableData,
-                         FilterAction)
-        row_actions = (DeleteTableData,)
+                         FilterAction, ExecuteWorkflowAction)
+        row_actions = (DeleteTableData, )

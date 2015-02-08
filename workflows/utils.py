@@ -56,6 +56,24 @@ def addWorkflow(self, request, context):
                           _('Unable to add workflow'))
         return []
 
+# request - horizon environment settings
+# context - user inputs from form
+def executeWorkflow(self, request, context):
+    try:
+
+        workflowId = context.get('workflowId')
+        description = context.get('description')
+
+        url = integra_url + "/workflows/" + workflowId
+        requests.post(url, verify=False, auth=HTTPBasicAuth('admin', 'integra'), headers=json_headers)
+
+    except:
+        print "Exception inside utils.executeWorkflow"
+        print traceback.format_exc()
+        exceptions.handle(self.request,
+                          _('Unable to execute workflow'))
+        return []
+
 # id is required for table
 def deleteWorkflow(self, workflowId):
     try:
