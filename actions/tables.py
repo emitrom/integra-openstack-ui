@@ -2,21 +2,21 @@ from django.utils.translation import ugettext_lazy as _
 
 from horizon import tables
 
-from openstack_dashboard.dashboards.integra.providers import utils
+from openstack_dashboard.dashboards.integra.actions import utils
 
 
 class AddTableData(tables.LinkAction):
     name = "add"
-    verbose_name = _("Add Provider")
-    url = "horizon:integra:providers:create"
+    verbose_name = _("Add Action")
+    url = "horizon:integra:actions:create"
     classes = ("btn-launch", "ajax-modal")
 
 class DeleteTableData(tables.DeleteAction):
-    data_type_singular = _("Provider")
-    data_type_plural = _("Providers")
+    data_type_singular = _("Action")
+    data_type_plural = _("Action")
 
     def delete(self, request, obj_id):
-        utils.deleteProvider(self, obj_id)
+        utils.deleteAction(self, obj_id)
 
 class FilterAction(tables.FilterAction):
     def filter(self, table, posts, filter_string):
@@ -31,7 +31,8 @@ class UpdateRow(tables.Row):
     def get_data(self, request, post_id):
         pass
 
-class ProviderTable(tables.DataTable):
+class ActionTable(tables.DataTable):
+
     id = tables.Column("id",
                           verbose_name=_("Id"))
 
@@ -43,8 +44,7 @@ class ProviderTable(tables.DataTable):
 
     class Meta:
         name = "integra"
-        verbose_name = _("Providers")
-        #status_columns = ["status"]
+        verbose_name = _("Actions")
         row_class = UpdateRow
         table_actions = (AddTableData,
                          FilterAction)

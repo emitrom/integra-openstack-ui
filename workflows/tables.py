@@ -33,6 +33,9 @@ class UpdateRow(tables.Row):
 
 class WorkflowTable(tables.DataTable):
 
+    id = tables.Column("id",
+                          verbose_name=_("Id"))
+
     name = tables.Column("name",
                           verbose_name=_("Name"))
 

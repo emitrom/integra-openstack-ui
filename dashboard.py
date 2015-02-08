@@ -11,7 +11,7 @@ class Providers(horizon.PanelGroup):
 class Workflows(horizon.PanelGroup):
     slug = "workflows"
     name = _("Workflows")
-    panels = ('workflows',)
+    panels = ('workflows', 'actions')
 
 class Schedules(horizon.PanelGroup):
     slug = "schedules"
