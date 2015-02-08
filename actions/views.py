@@ -6,7 +6,7 @@ from openstack_dashboard.dashboards.integra.actions.workflows.add_action import 
 
 class PostIndexView(tables.DataTableView):
     table_class = ActionTable
-    template_name = 'integra/schedules/index.html'
+    template_name = 'integra/actions/index.html'
 
     def get_data(self):
         return utils.getActions(self)

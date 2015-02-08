@@ -3,13 +3,29 @@ from django.utils.translation import ugettext_lazy as _
 from horizon import tables
 
 from openstack_dashboard.dashboards.integra.schedules import utils
-
+from django.utils.http import urlencode
+from django.core.urlresolvers import reverse
 
 class AddTableData(tables.LinkAction):
-    name = "add"
+    name = "addSchedule"
     verbose_name = _("Add Schedule")
     url = "horizon:integra:schedules:create"
     classes = ("btn-launch", "ajax-modal")
+
+
+class ScheduleTasksData(tables.LinkAction):
+    name = "addTask"
+    verbose_name = _("Schedule Tasks")
+    url = "horizon:integra:schedules:addTask"
+    classes = ("btn-launch", "ajax-modal")
+
+    def get_link_url(self, datum):
+        base_url = reverse(self.url)
+
+        params = urlencode({"source_id": self.table.get_object_id(datum)})
+
+        return "?".join([base_url, params])
+
 
 class DeleteTableData(tables.DeleteAction):
     data_type_singular = _("Schedule")
@@ -49,9 +65,9 @@ class ScheduleTable(tables.DataTable):
 
     class Meta:
         name = "integra"
-        verbose_name = _("Providers")
+        verbose_name = _("Schedules")
         #status_columns = ["status"]
         row_class = UpdateRow
         table_actions = (AddTableData,
                          FilterAction)
-        row_actions = (DeleteTableData,)
+        row_actions = (DeleteTableData,ScheduleTasksData)
