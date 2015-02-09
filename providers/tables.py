@@ -41,6 +41,18 @@ class ProviderTable(tables.DataTable):
     description = tables.Column("description",
                           verbose_name=_("Description"))
 
+    hostname = tables.Column("hostname",
+                          verbose_name=_("Hostname"))
+
+    port = tables.Column("port",
+                          verbose_name=_("Port"))
+
+    timeout = tables.Column("timeout",
+                          verbose_name=_("Timeout"))
+
+    secured = tables.Column("secured",
+                          verbose_name=_("Secured"))
+
     class Meta:
         name = "integra"
         verbose_name = _("Providers")

@@ -21,10 +21,14 @@ class Provider:
     Provider data
     """
 
-    def __init__(self, id, name, description):
+    def __init__(self, id, name, description, hostname, port, timeout, secured):
         self.id = id
         self.name = name
         self.description = description
+        self.hostname = hostname
+        self.port = port
+        self.timeout = timeout
+        self.secured = secured
 
 def getProviders(self):
     try:
@@ -32,9 +36,7 @@ def getProviders(self):
 
         providers = []
         for provider in r.json()['providers']:
-            print(provider)
-            print(provider[u'id'])
-            providers.append(Provider(provider[u'id'], provider[u'name'], provider[u'description']))
+            providers.append(Provider(provider[u'id'], provider[u'name'], provider[u'description'], provider[u'hostname'], provider[u'port'], provider[u'timeout'], provider[u'secured']))
 
         return providers
 

@@ -11,17 +11,22 @@ class Providers(horizon.PanelGroup):
 class Workflows(horizon.PanelGroup):
     slug = "workflows"
     name = _("Workflows")
-    panels = ('workflows', 'actions')
+    panels = ('workflows',)
 
 class Schedules(horizon.PanelGroup):
     slug = "schedules"
     name = _("Schedules")
     panels = ('schedules',)
 
+class Jobs(horizon.PanelGroup):
+    slug = "jobs"
+    name = _("Jobs")
+    panels = ('jobs',)
+
 class Integra(horizon.Dashboard):
     name = _("Integra")
     slug = "integra"
-    panels = (Providers, Workflows, Schedules)  # Add your panels here.
+    panels = (Providers, Workflows, Schedules, Jobs)  # Add your panels here.
     default_panel = 'providers'  # Specify the slug of the default panel.
 
 
