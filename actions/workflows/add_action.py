@@ -10,13 +10,19 @@ requests.packages.urllib3.disable_warnings()
 
 class SetAddDetailsAction(workflows.Action):
 
-
     providerActions = utils.getProviderActions(requests)
     providers = utils.getProviders(requests)
 
     # providerChoices = [('', '-- Provider Actions --'), ] + [(providerAction.id, providerAction.name) for providerAction in providerActions]
     providerActionsChoices = [(providerAction.id, providerAction.name) for providerAction in providerActions]
     providerChoices = [(provider.id, provider.name) for provider in providers]
+
+    timeout = forms.IntegerField(
+        label=_("Timeout"),
+        required=True,
+        min_value=1,
+        max_value=100000,
+        help_text=_("Timeout"))
 
     name = forms.CharField(
         label=_("Name"),
