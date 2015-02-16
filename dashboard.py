@@ -2,6 +2,10 @@ from django.utils.translation import ugettext_lazy as _
 
 import horizon
 
+class Actions(horizon.PanelGroup):
+    slug = "actions"
+    name = _("Actions")
+    panels = ('actions',)
 
 class Providers(horizon.PanelGroup):
     slug = "providers"
@@ -26,7 +30,7 @@ class Jobs(horizon.PanelGroup):
 class Integra(horizon.Dashboard):
     name = _("Integra")
     slug = "integra"
-    panels = (Providers, Workflows, Schedules, Jobs)  # Add your panels here.
+    panels = (Actions, Providers, Workflows, Schedules, Jobs)  # Add your panels here.
     default_panel = 'providers'  # Specify the slug of the default panel.
 
 

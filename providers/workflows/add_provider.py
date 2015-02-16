@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from openstack_dashboard.dashboards.integra.providers import utils
 
 
-class SetPostDetailsAction(workflows.Action):
+class SetProviderDetailsAction(workflows.Action):
 
     name = forms.CharField(
         label=_("Name"),
@@ -51,11 +51,11 @@ class SetPostDetailsAction(workflows.Action):
     def __init__(self, request, context, *args, **kwargs):
         self.request = request
         self.context = context
-        super(SetPostDetailsAction, self).__init__(
+        super(SetProviderDetailsAction, self).__init__(
             request, context, *args, **kwargs)
 
-class SetPostDetails(workflows.Step):
-    action_class = SetPostDetailsAction
+class SetProviderDetails(workflows.Step):
+    action_class = SetProviderDetailsAction
     contributes = ("name", "description", "hostname", "port", "timeout", "secured")
 
     def contribute(self, data, context):
@@ -68,11 +68,6 @@ class SetPostDetails(workflows.Step):
             context['secured'] = data.get("secured", "")
         return context
 
-
-# =====
-# Create the post
-# =====
-
 class AddProvider(workflows.Workflow):
     slug = "add"
     name = _("Add")
@@ -81,18 +76,13 @@ class AddProvider(workflows.Workflow):
     failure_message = _('Unable to add provider "%s".')
     success_url = "horizon:integra:providers:index"
     failure_url = "horizon:integra:providers:index"
-    default_steps = (SetPostDetails,)
+    default_steps = (SetProviderDetails,)
 
     def format_status_message(self, message):
          return message % self.context.get('name', 'unknown provider')
 
     def handle(self, request, context):
         try:
-            for k, v in context.items():
-                print(k, v)
-                print("-----------------")
-            print("===================")
-
             utils.addProvider(self, request, context)
             return True
         except Exception:

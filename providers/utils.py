@@ -79,15 +79,3 @@ def deleteProvider(self, post_id):
         exceptions.handle(self.request,
                           _('Unable to delete provider'))
         return False
-
-
-@register.filter
-def parse_time(xmlrpcdt, default=None):
-    try:
-        struct = time.strptime(str(xmlrpcdt), "%Y%m%dT%H:%M:%S")
-        dt = datetime.fromtimestamp(mktime(struct))
-        return dt.strftime("%B %d, %Y at %H:%M")
-    except Exception:
-        print "Exception inside utils.parse_time"
-        print traceback.format_exc()
-        return default or ''

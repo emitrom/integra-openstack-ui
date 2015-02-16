@@ -50,7 +50,7 @@ def getActions(self):
 def getProviderActions(self):
     try:
 
-        r = requests.get(integra_url + "/provider_actions/45", verify=False, auth=HTTPBasicAuth('admin', 'integra'), headers=json_headers)
+        r = requests.get(integra_url + "/provider_actions/1", verify=False, auth=HTTPBasicAuth('admin', 'integra'), headers=json_headers)
 
         providerActions = []
         for providerAction in r.json()['providerActions']:

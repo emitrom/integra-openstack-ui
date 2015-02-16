@@ -8,7 +8,7 @@ from openstack_dashboard.dashboards.integra.providers import utils
 class AddTableData(tables.LinkAction):
     name = "add"
     verbose_name = _("Add Provider")
-    url = "horizon:integra:providers:create"
+    url = "horizon:integra:providers:add"
     classes = ("btn-launch", "ajax-modal")
 
 class DeleteTableData(tables.DeleteAction):
@@ -19,11 +19,10 @@ class DeleteTableData(tables.DeleteAction):
         utils.deleteProvider(self, obj_id)
 
 class FilterAction(tables.FilterAction):
-    def filter(self, table, posts, filter_string):
-        """Naive case-insensitive search."""
+    def filter(self, table, providers, filter_string):
         filterString = filter_string.lower()
-        return [post for post in posts
-                if filterString in post.title.lower()]
+        return [provider for provider in providers
+                if filterString in provider.title.lower()]
 
 class UpdateRow(tables.Row):
     ajax = True
@@ -56,7 +55,6 @@ class ProviderTable(tables.DataTable):
     class Meta:
         name = "integra"
         verbose_name = _("Providers")
-        #status_columns = ["status"]
         row_class = UpdateRow
         table_actions = (AddTableData,
                          FilterAction)
