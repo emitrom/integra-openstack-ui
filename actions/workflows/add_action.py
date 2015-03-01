@@ -16,7 +16,8 @@ class SetAddDetailsAction(workflows.Action):
     # providerChoices = [('', '-- Provider Actions --'), ] + [(providerAction.id, providerAction.name) for providerAction in providerActions]
     providerActionsChoices = [(providerAction.id, providerAction.name) for providerAction in providerActions]
     providerChoices = [(provider.id, provider.name) for provider in providers]
-
+    for providerAction in providerActions:
+        print providerAction.id
     timeout = forms.IntegerField(
         label=_("Timeout"),
         required=True,
@@ -68,7 +69,7 @@ class SetAddDetailsAction(workflows.Action):
 
 class SetAddDetails(workflows.Step):
     action_class = SetAddDetailsAction
-    contributes = ("name", "description", "action", "provider")
+    contributes = ("id", "name", "description", "action", "provider")
 
     def contribute(self, data, context):
         if data:

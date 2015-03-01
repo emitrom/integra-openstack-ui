@@ -1,16 +1,22 @@
 import traceback
+from integra.RestTemplate import RestTemplate
+
 from requests.auth import HTTPBasicAuth
 
 from django.utils.translation import ugettext_lazy as _
-import requests
 
 from horizon import exceptions
+import requests
+from integra.integra import workflowAction, provider
+
+from horizon import exceptions
+
 
 requests.packages.urllib3.disable_warnings()
 
 integra_url = "https://localhost:8443/rest"
 json_headers = {'Accept': 'application/json'}
-
+RestTemplate().init('https://localhost:8443/rest', 'admin', 'integra')
 class Action:
     """
     Action data
@@ -49,13 +55,8 @@ def getActions(self):
 
 def getProviderActions(self):
     try:
-        r = requests.get(integra_url + "/provider_actions/1", verify=False, auth=HTTPBasicAuth('admin', 'integra'), headers=json_headers)
-
-        providerActions = []
-        for providerAction in r.json()['providerActions']:
-            providerActions.append(ProviderAction(providerAction[u'id'], providerAction[u'name'], providerAction[u'description']))
-
-        return providerActions
+        provider_actions = RestTemplate().get_all(RestTemplate.PROVIDER_ACTIONS + "/1")
+        return provider_actions.providerAction
 
     except:
         exceptions.handle(self.request,
@@ -64,16 +65,9 @@ def getProviderActions(self):
 
 def getProviders(self):
     try:
+        provider_list = RestTemplate().get_all(RestTemplate.PROVIDERS)
 
-        r = requests.get(integra_url + "/providers", verify=False, auth=HTTPBasicAuth('admin', 'integra'), headers=json_headers)
-
-        providers = []
-        for provider in r.json()['providers']:
-            providers.append(ProviderAction(provider[u'id'], provider[u'name'], provider[u'description']))
-        #for provider in r.json()['providers']:
-        #    providers.append(provider)
-
-        return providers
+        return provider_list.provider
 
     except:
         exceptions.handle(self.request,
@@ -84,13 +78,21 @@ def getProviders(self):
 def addAction(self, request, context):
     try:
 
-        name = context.get('name')
-        description = context.get('description')
-        action = context.get('action')
+        #name = context.get('name')
+        #description = context.get('description')
+        #action = context.get('action')
 
-        payload = {'name': name, 'description': description}
-        requests.post(integra_url + "/workflow_actions", json=payload, verify=False, auth=HTTPBasicAuth('admin', 'integra'), headers=json_headers)
+        #payload = {'name': name, 'description': description}
+        #requests.post(integra_url + "/workflow_actions", json=payload, verify=False, auth=HTTPBasicAuth('admin', 'integra'), headers=json_headers)
 
+        workflow_action = workflowAction()
+        provider = RestTemplate().get_by_id(RestTemplate.PROVIDERS, '1')
+        provider_action = RestTemplate().get_by_id(RestTemplate.WORKFLOW_ACTIONS, '1')
+        workflow_action.set_name(context.get('name'))
+        workflow_action.set_description(context.get('description'))
+        workflow_action.set_provider(provider)
+        workflow_action.set_providerAction(provider_action)
+        RestTemplate().post(RestTemplate.WORKFLOW_ACTIONS, workflow_action)
     except:
         print "Exception inside utils.addWorkflow"
         print traceback.format_exc()
