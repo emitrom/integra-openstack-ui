@@ -2,6 +2,7 @@ import traceback
 
 from horizon import workflows, forms, exceptions
 from django.utils.translation import ugettext_lazy as _
+from integra.integra import providers
 
 from openstack_dashboard.dashboards.integra.actions import utils
 from django.template.defaultfilters import filesizeformat
@@ -9,15 +10,9 @@ import requests
 requests.packages.urllib3.disable_warnings()
 
 class SetAddDetailsAction(workflows.Action):
-
-    providerActions = utils.getProviderActions(requests)
     providers = utils.getProviders(requests)
-
-    # providerChoices = [('', '-- Provider Actions --'), ] + [(providerAction.id, providerAction.name) for providerAction in providerActions]
-    providerActionsChoices = [(providerAction.id, providerAction.name) for providerAction in providerActions]
     providerChoices = [(provider.id, provider.name) for provider in providers]
-    for providerAction in providerActions:
-        print providerAction.id
+
     timeout = forms.IntegerField(
         label=_("Timeout"),
         required=True,
@@ -37,11 +32,37 @@ class SetAddDetailsAction(workflows.Action):
         max_length=120,
         help_text=_("Description"))
 
-    provider = forms.ChoiceField(
+    provider_choices = forms.ChoiceField(
         label=_("Providers"),
         choices=providerChoices,
         required=True,
         help_text=_("Providers"))
+
+    #image_id = forms.ChoiceField(
+    #    label=_("Image Name"),
+    #    required=False,
+    #    widget=forms.SelectWidget(
+    #        data_attrs=('volume_size',),
+    #        transform=lambda action: ("%s (%s)" % (action.id,action.name))))
+    class Meta:
+        name = _("Provider Details")
+
+    def handle(self, request, context):
+        return None
+    def __init__(self, request, context, *args, **kwargs):
+        self.request = request
+        self.context = context
+
+        super(SetAddDetailsAction, self).__init__(
+            request, context, *args, **kwargs)
+
+class SetWorkflowActionDetailsAction(workflows.Action):
+
+    providerActions = utils.getProviderActions(requests)
+    providerActionsChoices = [(providerAction.id, providerAction.name) for providerAction in providerActions]
+
+    for providerAction in providerActions:
+        print providerAction.id
 
     action = forms.ChoiceField(
         label=_("Provider Actions"),
@@ -50,21 +71,14 @@ class SetAddDetailsAction(workflows.Action):
         help_text=_("Provider Actions"))
 
 
-    #image_id = forms.ChoiceField(
-    #    label=_("Image Name"),
-    #    required=False,
-    #    widget=forms.SelectWidget(
-    #        data_attrs=('volume_size',),
-    #        transform=lambda action: ("%s (%s)" % (action.id,action.name))))
-
 
     class Meta:
-        name = _("Details")
+        name = _("Provider Action Details")
 
     def __init__(self, request, context, *args, **kwargs):
         self.request = request
         self.context = context
-        super(SetAddDetailsAction, self).__init__(
+        super(SetWorkflowActionDetailsAction, self).__init__(
             request, context, *args, **kwargs)
 
 class SetAddDetails(workflows.Step):
@@ -79,6 +93,16 @@ class SetAddDetails(workflows.Step):
             context['provider'] = data.get("provider", "")
         return context
 
+class SetWorkflowActionDetails(workflows.Step):
+    action_class = SetWorkflowActionDetailsAction
+    after = SetAddDetails
+    contributes = ("action")
+
+    def contribute(self, data, context):
+        if data:
+            context['action'] = data.get("action", "")
+        return context
+
 class AddAction(workflows.Workflow):
     slug = "add"
     name = _("Add")
@@ -87,7 +111,8 @@ class AddAction(workflows.Workflow):
     failure_message = _('Unable to add action "%s".')
     success_url = "horizon:integra:actions:index"
     failure_url = "horizon:integra:actions:index"
-    default_steps = (SetAddDetails,)
+    default_steps = (SetAddDetails,SetWorkflowActionDetails)
+    wizard = True
 
     def format_status_message(self, message):
          return message % self.context.get('name', 'unknown action')

@@ -13,7 +13,7 @@ class AddTableData(tables.LinkAction):
 
 class DeleteTableData(tables.DeleteAction):
     data_type_singular = _("Action")
-    data_type_plural = _("Action")
+    data_type_plural = _("Actions")
 
     def delete(self, request, obj_id):
         utils.deleteAction(self, obj_id)
